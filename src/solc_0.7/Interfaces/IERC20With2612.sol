@@ -2,9 +2,9 @@
 
 pragma solidity 0.7.3;
 
-import "../../_lib/openzeppelin/contracts/token/erc20/IERC20.sol";
+import "../../../_lib/openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-interface ERC20With2612 is IERC20 {
+interface IERC20With2612 is IERC20 {
     function permit(
         address owner,
         address spender,

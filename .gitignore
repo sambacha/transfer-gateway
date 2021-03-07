@@ -1,15 +1,31 @@
-coverage*
-#Buidler files
 cache/
 artifacts/
 
-node_modules/
-!test/node_modules/
-.env
-contractsInfo.json
-deployments/buidlerevm_*
-deployments/localhost_*
+_lib
+
+coverage*
+typechain/
+gasReporterOutput.json
 
 .vscode/*
 !.vscode/settings.json.default
-_lib
+!.vscode/launch.json.default
+!.vscode/extensions.json.default
+
+node_modules/
+.env
+
+.yalc
+yalc.lock
+
+contractsInfo.json
+deployments/hardhat
+deployments/localhost
+
+export/*
+!export/artifacts
+!export/deploy
+export/deploy/*
+!export/deploy/001_deploy_erc20_transfer_gateway.js
+!export/deploy/002_deploy_erc721_transfer_gateway.js
+failing_metadata/

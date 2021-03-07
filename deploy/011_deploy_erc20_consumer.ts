@@ -1,7 +1,8 @@
-import {BuidlerRuntimeEnvironment, DeployFunction} from '@nomiclabs/buidler/types';
+import {HardhatRuntimeEnvironment} from 'hardhat/types';
+import {DeployFunction} from 'hardhat-deploy/types';
 
-const func: DeployFunction = async function (bre: BuidlerRuntimeEnvironment) {
-  const {deployments, getNamedAccounts} = bre;
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const {deployments, getNamedAccounts} = hre;
   const {deploy} = deployments;
 
   const {deployer} = await getNamedAccounts();
@@ -11,7 +12,11 @@ const func: DeployFunction = async function (bre: BuidlerRuntimeEnvironment) {
 
   await deploy('ERC20Consumer', {
     from: deployer,
-    args: [erc20TransferGateway.address, erc20Token.address, '500000000000000000'],
+    args: [
+      erc20TransferGateway.address,
+      erc20Token.address,
+      '500000000000000000',
+    ],
     log: true,
   });
 };

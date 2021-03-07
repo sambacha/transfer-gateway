@@ -3,11 +3,14 @@
 pragma solidity 0.7.3;
 
 import "./BaseERC20.sol";
-import "../Interfaces/DAIERC20.sol";
+import "../Interfaces/IERC20With2612.sol";
 
-contract DAIWithInitialBalance is BaseERC20, DAIERC20 {
-    // bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)");
-    bytes32 internal constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
+///@notice test ERC20 token that give initial balance to all accounts that can claim it in time.
+contract ERC20WithInitialBalance is BaseERC20, IERC20With2612 {
+    // TODO inject actual hash or use 0.6.12
+    bytes32 internal constant PERMIT_TYPEHASH = keccak256(
+        "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+    );
 
     function DOMAIN_SEPARATOR() external view override returns (bytes32) {
         return _DOMAIN_SEPARATOR;
@@ -18,30 +21,30 @@ contract DAIWithInitialBalance is BaseERC20, DAIERC20 {
     }
 
     function permit(
-        address holder,
+        address owner,
         address spender,
-        uint256 nonce,
-        uint256 expiry,
-        bool allowed,
+        uint256 value,
+        uint256 deadline,
         uint8 v,
         bytes32 r,
         bytes32 s
     ) external override {
+        require(owner != address(0), "INVALID_ZERO_ADDRESS");
+
+        uint256 currentNonce = _nonces[owner];
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
                 _DOMAIN_SEPARATOR,
-                keccak256(abi.encode(PERMIT_TYPEHASH, holder, spender, nonce, expiry, allowed))
+                keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, currentNonce, deadline))
             )
         );
+        require(owner == ecrecover(digest, v, r, s), "INVALID_SIGNATURE");
+        require(deadline == 0 || block.timestamp <= deadline, "TOO_LATE");
 
-        require(holder != address(0), "Dai/invalid-address-0");
-        require(holder == ecrecover(digest, v, r, s), "Dai/invalid-permit");
-        require(expiry == 0 || block.timestamp <= expiry, "Dai/permit-expired");
-        require(nonce == _nonces[holder]++, "Dai/invalid-nonce");
-        uint256 wad = allowed ? uint256(-1) : 0;
-        _allowances[holder][spender] = wad;
-        emit Approval(holder, spender, wad);
+        _nonces[owner] = currentNonce + 1;
+        _allowances[owner][spender] = value;
+        emit Approval(owner, spender, value);
     }
 
     // /////////////////////////////////// STORAGE SLOTS /////////////////////////////////////////

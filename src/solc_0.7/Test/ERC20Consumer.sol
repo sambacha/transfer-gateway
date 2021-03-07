@@ -3,9 +3,10 @@
 pragma solidity 0.7.3;
 
 import "../BaseERC20TransferRecipient.sol";
-import "../../_lib/openzeppelin/contracts/token/erc20/IERC20.sol";
-import "../../_lib/openzeppelin/contracts/token/erc20/SafeERC20.sol";
+import "../../../_lib/openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../../../_lib/openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
+///@notice Can Receive ERC20 payment either from the transfer getaway or through the standard approval-based mechanism.
 contract ERC20Consumer is BaseERC20TransferRecipient {
     using SafeERC20 for IERC20;
 
@@ -15,7 +16,7 @@ contract ERC20Consumer is BaseERC20TransferRecipient {
     event Purchase(address buyer, address recipient, uint256 id);
 
     constructor(
-        ERC20TransferGateway erc20TransferGateway,
+        address erc20TransferGateway,
         address token,
         uint256 price
     ) BaseERC20TransferRecipient(erc20TransferGateway) {
